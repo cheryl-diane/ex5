@@ -1,37 +1,106 @@
-<article class="speakerslist <% if (pageID == 'home') { %>jumbotron hidden-xs<% } %>">
-  <div class="container">
-    <div class="row">
-        <% speakers.forEach(function(item) { %>
-        <div class="<% if (pageID == 'home') { %>col-sm-4 text-center<% } else { %>col-sm-8 <% } %>">
-          <h3 class="speakerslist-title"><%= item.title %></h3>
-          <h5 class="speakerslist-name">with <a href="/speakers/<%= item.shortname %>"><%= item.name %></a></h5>
-          <p class="speakerslist-info">
-            <a href="/speakers/<%= item.shortname %>">
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyACSEy9UbfEK39wdhUmb7hNbBQVDruLrHk&callback=initMap"
+async defer></script>
 
-              <% if (pageID == 'home') { %>
-                <img class="speakerslist-img img-circle" src="/images/speakers/<%= item.shortname %>_tn.jpg" alt="Photo of <%= item.name %>"></a>
-              <% } %>
+<body>
+  <article class="speakerslist <% if (pageID == 'home') { %>hidden-sm<% } %>" style = "background-color: #FCEB97">
+    <div class="container" style = "background-color: #FCEB97">
+      <div class="row">
+          <% speakers.forEach(function(item) { %>
+          <div class="<% if (pageID == 'home') { %>d-none d-md-block col-md-6 col-lg-4 col-xl-3 text-center<% } else { %>col-sm-12 <% } %>">
+            <h3 class="speakerslist-title"><small> <%= item.site %> </small></h3>
+            <p class="speakerslist-info">
+              <a href="/speakers/<%= item.id %>">
 
-              <% if (pageID == 'speakerList') { %>
-                <img class="speakerslist-img img-circle pull-left" src="/images/speakers/<%= item.shortname %>_tn.jpg" alt="Photo of <%= item.name %>"></a>
+                <% if (pageID == 'home') { %>
+                  <h5 class="speakerslist-name"><a href="/speakers/<%= item.id %>"> <small><%= item.category %></a></small></h5>
+                  <img class="speakerslist-img rounded-circle" src="<%= item.image %>" alt="Photo of <%= item.site %>" width = "200"></a>
+                <% } %>
+
+                <% if (pageID == 'speakerList') { %>
+                  <img class="speakerslist-img img-circle pull-left" src="<%= item.image %>" alt="Photo of <%= item.name %>" width = "200" style = "display: inline-block; float: left; margin-bottom: 10px;"></a>
+                  <iframe width="300" height="200" src="<%= item.videoEmbed %>" style = "display: inline-block;"> </iframe>
+                  <h5 class="speakerslist-name"><small><%= item.category %></small></h5>
+                <% } %>
+              </a>
+
+              <% if (pageID == 'speakerDetail') { %>
+                <script>
+                  var locObj1;
+                  var map;
+                  var mapCenter = {lat: <%- item.lat %>, lng: <%- item.long %>};
+
+                  locObj1 = {
+                    category: "<%- item.category %>",
+                    info: "<%- item.site %>",
+                    lat: <%- item.lat %>,
+                    lng: <%- item.long %>
+                  };
+
+                  locArray = [locObj1];
+
+                  function placeMarker(mapToUse, locArrayToUse, indexToUse){
+                    var locObjToUse = locArrayToUse[indexToUse];
+                    var markerPos = {lat: locObjToUse.lat, lng: locObjToUse.lng}
+                    var marker = new google.maps.Marker({
+                      position: markerPos,
+                      map: mapToUse
+                    });
+
+                    //mapToUse.panTo(marker.getPosition());
+
+                    var contentString = '<div style="color: darkblue">'+
+                    locObjToUse.info +
+                    '</div>';
+
+                    var infowindow = new google.maps.InfoWindow({
+                      content: contentString
+                    });
+                    marker.addListener('mouseover', function() {
+                      infowindow.open(mapToUse, marker);
+                    });
+                    marker.addListener('mouseout', function() {
+                      infowindow.close(mapToUse, marker);
+                    });
+                  }
+
+                  function initMap() {
+                    map = new google.maps.Map(document.getElementById('map'), {
+                      center: mapCenter,
+                      zoom: <%- item.zoom %>,
+                      gestureHandling: 'none',
+                      mapTypeControl: false,
+                      zoomControl: false,
+                      scaleControl: false,
+                      scrollwheel: false,
+                      streetViewControl: false,
+                      disableDoubleClickZoom: true,
+                      fullscreenControl: false
+                    });
+
+                    for (i = 0; i < locArray.length; i++) {
+                      placeMarker(map, locArray, i);
+                    }
+                  }
+                </script>
+                <img class="speakerslist-img img-responsive pull-left" src="<%= item.image %>" alt="Photo of <%= item.name %>" width = "800"></a>
+                <p> <small> <%= item.info %> </small> </p>
+                <iframe width="375" height="240" src="<%= item.videoEmbed %>" style = "display: inline-block; float: left; margin-right: 18px; margin-bottom: 10px;"> </iframe>
+                <div id="map" style = "width:375px; height:240px;"></div>
               <% } %>
             </a>
 
-            <% if (pageID == 'speakerDetail') { %>
-              <img class="speakerslist-img img-responsive pull-left" src="/images/speakers/<%= item.shortname %>.jpg" alt="Photo of <%= item.name %>"></a>
-            <% } %>
-          </a>
 
-            <% if (pageID !== 'home') { %>
-              <% if (pageID == 'speakerList') { %>
-                <%= item.summary %>
-              <% } else { %>
-                <%- item.description %>
+              <% if (pageID !== 'home') { %>
+                <% if (pageID == 'speakerList') { %>
+                  <%= item.summary %>
+                <% } else { %>
+                  <%- item.description %>
+                <% } %>
               <% } %>
-            <% } %>
-          </p>
-        </div>
-        <%  }); %>
-    </div><!-- row -->
-  </div><!-- container -->
-</article>
+            </p>
+          </div>
+          <%  }); %>
+      </div><!-- row -->
+    </div><!-- container -->
+  </article>
+</body>
