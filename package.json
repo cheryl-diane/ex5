@@ -9,8 +9,9 @@
   "author": "Anselm Spoerri (building on Ray Villalobos' code",
   "license": "MIT",
   "dependencies": {
-    "ejs": "^2.4.2",
-    "express": "^4.14.0",
-    "reload": "^1.0.0"
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "google-maps-react": "^2.0.0",
+    "reload": "^1.1.7"
   }
 }
