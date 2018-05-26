@@ -8,8 +8,8 @@ app.set('appData', dataFile);
 app.set('view engine', 'ejs');
 app.set('views', 'app/views');
 
-app.locals.siteTitle = 'Roux Meetups';
-app.locals.allSpeakers = dataFile.speakers;
+app.locals.siteTitle = 'My Hometown';
+app.locals.allSpeakers = dataFile.data.highlights;
 
 app.use(express.static('app/public'));
 app.use(require('./routes/index'));
